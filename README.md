@@ -1,2 +1,1 @@
-# oj
-刷题、leetcode
+这是我的第一篇git 笔记
