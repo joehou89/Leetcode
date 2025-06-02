@@ -140,11 +140,78 @@ public:
 输出：6
 解释：上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。 
 ```  
-![]()  
+![](https://github.com/joehou89/Leetcode/blob/main/%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90%E7%BB%93%E6%9E%84%E5%9B%BE/rainwatertrap.png)  
+  
+## 算法分析  
+该题目可以用双指针进行，循环内套一层循环，主要是计算针对每一个i列，它的左右两边最大值进行比较之后的min值 - height[i], 这就是对应i的面积，用一个局部变量  
+进行相加即可。  
+代码如下:  
+```c
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int size = height.size();
+        int sum = 0;
+        for (int i = 0; i < size; i++)
+        {
+            if (i == 0 && i == size - 1)
+                continue;
+            
+            int rheight = height[i];
+            int lheight = height[i];
+            for (int r = i + 1; r < size; r++)
+            {
+                if (height[r] > rheight)
+                    rheight = height[r];
+            }
+            for (int l = i - 1; l >= 0; l--)
+            {
+                if (height[l] > lheight)
+                    lheight = height[l];
+            }
+            int h = min(lheight, rheight) - height[i];
+            if (h > 0)
+                sum += h;
+        }
+        return sum;
+    }
+};
+```  
+但是很遗憾的是该算法时间复杂度O(n2),超过了题目要求；一般来说，时间复杂度为O(n2)的大部分是可以降低为O(n)的，从算法实现上，就是把双for循环拆开，这里面有多余的计算,这里用到的就是动态规划算法。  
+当前位置的雨水面积: [min( 左右柱子的max， 右边柱子的max) - 当前柱子高度] * 单位面积  
+代码如下:  
+```c  
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int size = height.size();
+        vector<int> rheight(size, 0);
+        vector<int> lheight(size, 0);
 
+        lheight[0] = height[0];
+        for (int i = 1; i < size; i++)
+        {
+            lheight[i] = max(lheight[i- 1], height[i]);
+        }
+        rheight[size - 1] = height[size - 1];
+        for (int i = size - 2; i >= 0; i--)
+        {
+            rheight[i] = max(rheight[i + 1], height[i]);
+        }
 
-
-
+        int sum = 0;
+        for (int i = 0; i < size; i++)
+        {
+            int count = min(lheight[i], rheight[i]) - height[i];
+            if (count > 0)
+            {
+                sum += count;
+            }
+        }
+        return sum;
+    }
+};
+```  
 
 
 
